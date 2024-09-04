@@ -1,19 +1,13 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/-g0wqWfO)
-# HW2: 3D Morphable Face Model
+# 3D Morphable Face Model
 
 In this exercise, you will learn how to align a 3D Morphable Model (3DMM) to a 3D face scan using the Iterative Closest Point (ICP) and Gauss-Newton optimization algorithms.
 
 The objective of this exercise is to minimize the difference between the model and the face scan, so that the morphable model accurately represents the face scan. The four graded tasks in this exercise are designed to test your understanding of different aspects of the alignment process. These tasks are:
 
-1. __Shape matching (5%)__: Align the 3DMM to the face scan using procrustes analysis.
-2. __Rigid ICP (5%)__: Perform rigid ICP alignment between the 3DMM and the face scan.
-3. __Non-Rigid ICP (5%)__: Perform non-rigid ICP alignment between the morphable model and the face scan.
-4. __(Bonus) Point-to-Plane optimization (5%)__: Implement the Point-to-Plane optimization technique to further improve the alignment results.
-
-You need to complete the code in the following files: `fitting_3DMM.py` and `BFM.py`
-
-
-By the end of this exercise, you will have a deeper understanding of how to use ICP and Gauss-Newton algorithms for 3D face alignment. Good luck!
+1. __Shape matching__: Align the 3DMM to the face scan using procrustes analysis.
+2. __Rigid ICP__: Perform rigid ICP alignment between the 3DMM and the face scan.
+3. __Non-Rigid ICP__: Perform non-rigid ICP alignment between the morphable model and the face scan.
+4. __(Bonus) Point-to-Plane optimization__: Implement the Point-to-Plane optimization technique to further improve the alignment results.
 
 ## Init
 3D Morphable Model (3DMM) is a statistical model of the human face. It is a 3D shape model that can be used to represent a face in a compact form. The 3DMM is composed of a mean shape, a set of principal components (blend shapes).
@@ -28,11 +22,7 @@ BFM model |  Scan
 
 **Problem**: The BFM model is not aligned with the face scan. We need to align (or "fit") the BFM model to the face scan using the Iterative Closest Point (ICP) and Gauss-Newton optimization algorithms. First we align it in a non-rigid way, then we will use the Point-to-Plane (or Point-to-Surface – bonus) optimization technique to further improve the alignment results.
 
-(BFM on the left and the face scan on the right)
-
 <img src="teaser_imgs/init.png" width="550"> 
-
-**NOTE**: when run the first time the code will download the BFM model, the scan and other data in the data folder (it checks if the ./data folder exists)
 
 ## Task 1: Rigid shape matching
 On the image above you can notice red marks on the face scan and on the BFM model. These are the keypoints that we will use to align the two meshes. We will use them to align the two meshes.
@@ -69,17 +59,6 @@ $$
 $$
 
 where $p_i$ and $q_i$ are the $i$-th closest points in the scan and in the BFM model, respectively. $R$ is the rotation matrix, $t$ is the translation vector. 
-
-Though that it's very similar to the rigid shape matching task, but:
-* Here we transform the BFM model (while the scan is fixed) to the scan.
-* Don't optimize the scale parameter
-* The correspondence are much more noiser than the keypoints, that's why we need to use Gauss-Newton optimization to align the two meshes.
-
-
-__NOTE__: 
-* The rigid transform parameters are set in the BFM layer class. You can access them by `bfm_model.rot_vec` and `bfm_model.t`. The transform itself is already implemented in the `rigid_inference` function in the `BFM_layer` class.
-* To optimize the objective function you will need to find the Jacobian matrices of the objective function with respect to the rotation and translation parameters. These are defined in `BFM_layer.get_J_t` and `BFM_layer.get_J_rot` in `BFM.py`
-* The rotation is represented by a rotation vector (axis-angle representation). You can convert it to a rotation matrix using the `rodriguez` function in `BFM`
 
 __Task 2__: Implement the function `rigid_ICP` in the `fitting_3DMM.py` file.
 
@@ -174,7 +153,7 @@ Scan & BFM Overlay | BFM
 
 __Task 3__: Implement the function `non_rigid_fitting` in the `fitting_3DMM.py` file.
 
-## Task 4: Point-to-Plane ICP (Bonus)
+## Task 4: Point-to-Plane ICP
 
 You may have noticed that the functions `non_rigid_fitting` and `rigid_ICP` in the `fitting_3DMM.py` file also have a `loss_type` parameter. This parameter can be either `Point2Point` or `Point2Plane`. The `Point2Point` loss is the one we used in the previous tasks (by default). The `Point2Plane` loss is a more advanced loss that is more robust to outliers. It is defined as:
 
@@ -191,28 +170,3 @@ __Task 4__: Implement the `loss_type=Point2Plane` method in the `non_rigid_fitti
 Scan & BFM Overlay | BFM
 :-------------------------:|:-------------------------:|
 <img src="teaser_imgs/non_rigid_overlay_point2plain.gif" width="350"> |  <img src="teaser_imgs/non_rigid_bmf_point2plain.gif" width="350"> |   
-
-# Submission:
-
-First generate images of 3D face model:
-```
-pytest tests.py::test_make_screens
-```
-Then add them to git:
-```
-git add img_saves
-```
-
-Now you can save and submit your work using git.
-To trigger auto-grading, you need to push your changes to git:
-
-```
-git add BFM.py fitting_3DMM.py
-git commit -m "update"
-git push origin main
-```
-
-After you pushed to github, an **automatic test** will start.
-You can see the result at the `Actions` tab on your github repo page.
-
-__Important__: Do not add "/data" to commit. The directory is too large and will cause long waiting time for committingz changes and the auto-grading.
