@@ -1,0 +1,6 @@
+numpy
+tqdm
+scipy
+polyscope
+trimesh
+gdown
